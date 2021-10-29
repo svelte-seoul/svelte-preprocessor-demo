@@ -46,3 +46,6 @@ Preprocessor modify `Welcome.svelte` using `App.svelte` before compile time.
     <p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
 </div>
 ```
+
+Note that there's no need to modify `Welcome.svelte`. Wrapping `Welcome` with `div` in `App.svelte` produces same output.
+I just did it for preparing more complicated example.
