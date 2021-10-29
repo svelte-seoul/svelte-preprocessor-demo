@@ -8,6 +8,7 @@
 <style>
 	h2 {
 		color: var(--my-color);
+		background-color: var(--my-bg-color);
 		text-transform: uppercase;
 		font-size: 4em;
 		font-weight: 100;

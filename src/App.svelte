@@ -4,10 +4,15 @@
 
 <main>	
 	<h1>Demo</h1>
-	<Welcome name='Jayden' --my-color='blue'/>
+	<Welcome name='Jayden'/>
 </main>
 
 <style>
+	Welcome {
+		--my-color: blue;
+		--my-bg-color: red;
+	}
+
 	main {
 		text-align: center;
 		max-width: 480px;

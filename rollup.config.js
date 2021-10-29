@@ -4,8 +4,11 @@ import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import css from 'rollup-plugin-css-only';
+import cssParser from 'css';
 
 const production = !process.env.ROLLUP_WATCH;
+
+let cache = {};
 
 function serve() {
 	let server;
@@ -38,6 +41,49 @@ export default {
 	},
 	plugins: [
 		svelte({
+			preprocess: [
+				{
+					markup: ({content, filename}) => {
+						const [withoutPath, withoutPathAndExtension] = filename.match(/(\w+).svelte/);
+
+						const markupStart = content.indexOf('</script>') + '</script>'.length;
+						const markupEnd = content.indexOf('<style>');
+
+						const scriptArea = content.substr(0, markupStart);
+						const markupArea = content.substr(markupStart, markupEnd - markupStart);
+						const styleArea = content.substr(markupEnd);
+
+						const isHtmlTag = (input) => ['main', 'h1', 'h2', 'p'].includes(input);
+						const stripStyleTag = (input) => input.substr('<stye>'.length + 1, input.indexOf('</style>') - '<stye>'.length - 1)
+
+						let styles = {};
+
+						cssParser.parse(stripStyleTag(styleArea)).stylesheet.rules.forEach(({ selectors, declarations }) => {
+							if(!isHtmlTag(selectors[0])) {
+								const {property, value} = declarations;
+
+								styles[selectors[0]] = declarations.reduce((acc, {property, value}) => {
+									return acc += `${property}: ${value};`
+								}, '');
+							}
+						});
+
+						cache = {...cache, ...styles};
+
+						const wrap = (style, string) => (`<div style="display: contents; ${style}">${string}</div>`);
+						
+						if(cache[withoutPathAndExtension]) {
+							return { 
+								code: scriptArea 
+										+ wrap(cache[withoutPathAndExtension], markupArea) 
+										+ styleArea 
+							};
+						}
+
+						return {code: content};
+					}
+				}
+			],
 			compilerOptions: {
 				// enable run-time checks when not in production
 				dev: !production
