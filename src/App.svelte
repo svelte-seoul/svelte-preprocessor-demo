@@ -9,10 +9,11 @@
 
 <style>
 	Welcome {
+		/* display: contents; */
 		--my-color: blue;
 		--my-bg-color: red;
+		background-color: green;
 	}
-
 	main {
 		text-align: center;
 		max-width: 480px;

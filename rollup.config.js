@@ -44,6 +44,7 @@ export default {
 			preprocess: [
 				{
 					markup: ({content, filename}) => {
+
 						const [withoutPath, withoutPathAndExtension] = filename.match(/(\w+).svelte/);
 
 						const markupStart = content.indexOf('</script>') + '</script>'.length;
@@ -60,9 +61,11 @@ export default {
 
 						cssParser.parse(stripStyleTag(styleArea)).stylesheet.rules.forEach(({ selectors, declarations }) => {
 							if(!isHtmlTag(selectors[0])) {
+								const componentName = selectors[0];
+
 								const {property, value} = declarations;
 
-								styles[selectors[0]] = declarations.reduce((acc, {property, value}) => {
+								styles[componentName] = declarations.reduce((acc, {property, value}) => {
 									return acc += `${property}: ${value};`
 								}, '');
 							}
@@ -70,7 +73,7 @@ export default {
 
 						cache = {...cache, ...styles};
 
-						const wrap = (style, string) => (`<div style="display: contents; ${style}">${string}</div>`);
+						const wrap = (style, string) => (`<div style="${style}">${string}</div>`);
 						
 						if(cache[withoutPathAndExtension]) {
 							return { 
